@@ -1,0 +1,5 @@
+Index,QuestionNumber,QuestionTitle,TableFormat,ScaleMap
+1,Q1,Overall Liking,"Full,Mean,T2B,B2B",10=Like Extremely\n9=9\n8=8\n7=7\n6=6\n5=5\n4=4\n3=3\n2=2\n1=Dislike Extremely
+2,Q2,Purchase Intent,"1,2,T2B,3,B2B,4,5",5=Definitely Would Purchase\n4=Probably Would Purchase\n3=Might or Might Not Purchase\n2=Probably Would Not Purchase\n1=Definitely Would Not Purchase
+3,Q3,Scent Liking,"Full,Mean,T2B,B2B",10=Like Extremely\n9=9\n8=8\n7=7\n6=6\n5=5\n4=4\n3=3\n2=2\n1=Dislike Extremely
+4,Q4,Scent JAR,"JAR,T2B,B2B",5=Much Too Strong\n4=Very Strong\n3=Just About Right\n2=Very Weak\n1=Much Too Weak

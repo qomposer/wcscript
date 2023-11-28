@@ -1,0 +1,48 @@
+T1^
+ O%,OD,OI,OR,OV,P0,RV,S1,SA,SP,V2
+ PRODUCT
+ Total ^TN^0
+ Q1. Overall Liking
+ Like Extremely ^Q1_1(10)^
+ 9- ^(9)^
+ 8- ^(8)^
+ 7- ^(7)^
+ 6- ^(6)^
+ 5- ^(5)^
+ 4- ^(4)^
+ 3- ^(3)^
+ 2- ^(2)^
+ Dislike Extremely ^(1)^
+ Mean ^(1-10)^SM
+ Top 2 Box ^(8-10)^
+ Bottom 2 Box ^(9-10)^
+ ^ ^
+ Q2. Purchase Intent
+ Definitely Would Buy ^Q2_1(5)^
+ Probably Would Buy ^(4)^
+   Top 2 Box ^(4-5)^
+ Might Buy ^(3)^
+   Bottom 2 Box ^(1-2)^
+ Probably Would Not Buy ^(2)^
+ Definitely Would Not Buy ^(1)^
+ ^ ^
+ Q3. Scent Liking
+ Like Extremely ^Q3_1(10)^
+ 9- ^(9)^
+ 8- ^(8)^
+ 7- ^(7)^
+ 6- ^(6)^
+ 5- ^(5)^
+ 4- ^(4)^
+ 3- ^(3)^
+ 2- ^(2)^
+ Dislike Extremely ^(1)^
+ Mean ^(1-10)^SM
+ Top 2 Box ^(8-10)^
+ Bottom 2 Box ^(9-10)^
+ ^ ^
+ Q4. Scent JAR
+ JAR ^Q4_1(3)^
+ Too Strong ^(4-5)^
+ Too Weak ^(1-2)^
+ ^ ^
