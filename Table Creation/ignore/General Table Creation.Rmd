@@ -1,0 +1,15 @@
+---
+title: "Creating Tables"
+date: "11.26.2023"
+author: "Josh Greer"
+output: html_notebook
+---
+
+# Software Design
+
+## Internal Objects
+
+```{r}
+
+```
+

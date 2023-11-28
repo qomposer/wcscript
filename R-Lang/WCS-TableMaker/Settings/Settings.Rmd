@@ -1,0 +1,33 @@
+---
+title: "WCScript Settings"
+output: html_notebook
+---
+
+# Settings
+
+Settings are typically standard.
+
+```text
+OR,OI,O%,IV,S1,OB
+```
+
+```{r}
+suppressWarnings(
+    suppressMessages(
+        library(R6)
+    )
+)
+
+TableSettings <- R6::R6Class(
+    classname="TableSettings",
+    public = list(
+        initialize = function() {
+            public$settings <- "OR,OI,O%,IV,S1,OB"
+        }
+    )
+)
+
+Settings <- TableSettings$new()
+Settings
+```
+

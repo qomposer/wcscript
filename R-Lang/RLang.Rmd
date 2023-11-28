@@ -1,0 +1,16 @@
+
+
+```{r}
+suppressMessages(
+    suppressWarnings(
+        library(tidyverse
+)))
+
+tidyr::expand(data.frame(seq(1:10)))
+
+tibble::tibble(
+    abc = letters,
+    nums = seq(1:26)
+)
+```
+

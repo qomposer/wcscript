@@ -1,0 +1,5 @@
+[TABLES]
+<table_index_name>ex[[TQRE]|[T1]]^
+ <default_settings><additional_settings>
+ <long_tabs_section_name>ex[Product]
+ <section_data_filter>ex[Total ^TN^0]

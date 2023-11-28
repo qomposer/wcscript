@@ -1,0 +1,384 @@
+---
+title: "Loading Datamap"
+output: html_notebook
+---
+
+```{r}
+# The scale map is a collection of scales and values
+attribute_value_map <- c("1=Dislike Extremely
+2=Dislike Very Much
+3=Dislike Moderately
+4=Dislike Slightly
+5=Neither Like Nor Dislike
+6=Like Slightly
+7=Like Moderately
+8=Like Very Much
+9=Like Extremely")
+
+flat_value_map <- stringr::str_split(attribute_value_map, "\n") |> unlist() # list -> vector(string)
+flat_value_map
+purrr::map(flat_value_map, stringr::str_split, "=")
+
+
+
+flat_value_map <- unlist(stringr::str_split(attribute_value_map, "\n")); flat_value_map
+
+split_result <- purrr::map(flat_value_map, stringr::str_split, "=")[[1]]
+split_result
+
+stringr::str_split(string=attribute_value_map, pattern=regex(""))
+
+test_result <- list(c("1", "Dislike Extremely"), c("2",  "Dislike Very Much"))
+class(test_result[[1]])
+
+list(split_result[[1]], split_result[[2]])
+split_result[[1]]
+class(split_result[[2]])
+
+
+
+```
+
+```{r}
+
+suppressWarnings(suppressMessages({
+    library(stringr);
+    library(magrittr);
+    library(tibble);
+    library(purrr);
+}))
+
+# The scale map is a collection of scales and values
+# This example is a 9-point Likert rating scale
+attribute_value_map <- c("1=Dislike Extremely
+2=Dislike Very Much
+3=Dislike Moderately
+4=Dislike Slightly
+5=Neither Like Nor Dislike
+6=Like Slightly
+7=Like Moderately
+8=Like Very Much
+9=Like Extremely")
+
+# Splits on newline. str_split returns a list containing a string vector.
+# unlist() extracts the vector.
+flat_scale_map <- stringr::str_split(attribute_value_map, "\n") |> unlist() |> stringr::str_split("=")
+flat_scale_map
+
+scale_map_split <- stringr::str_split(attribute_value_map, "\n") |> unlist() |> stringr::str_split("=")
+
+scale_map_split
+
+# Vectors of scales
+scale_value <- sapply(scale_map_split, `[`, 1) |> as.integer()
+
+scale_string <- sapply(scale_map_split, `[`, 1)
+
+scale_label <- sapply(scale_map_split, `[`, 2) |> stringr::str_trim()
+
+scale_tibble <- tibble::tibble(
+    scale_value = scale_value,
+    scale_string = scale_string,
+    scale_label = scale_label
+)
+
+scale_tibble 
+
+```
+
+
+
+```{r}
+# assuming 'your_list' is your nested list
+your_list <- list(list(c("1", "Dislike Extremely")), list(c("2", "Dislike Very Much")))
+your_list
+# flatten the list
+flat_list <- unlist(your_list, recursive = FALSE)
+flat_list
+# convert the flattened list into a tibble
+library(tibble)
+df <- tibble(
+  attribute_value = sapply(flat_list, `[`, 1),
+  attribute_label = sapply(flat_list, `[`, 2)
+)
+df
+```
+
+```{r}
+library(tidyverse)
+library(openxlsx)
+
+dmap <- read.xlsx(xlsxFile="MapList.xlsx")
+dmap
+
+
+# Transform a single cell into a tibble
+cell_to_tibble <- function(cell) {
+    # Split the cell into lines
+    lines <- stringr::str_split(cell, "\n")[[1]]
+    
+    # Split each line into value and label
+    values_and_labels <- stringr::str_split(lines, "=")
+    
+    # Transform into a tibble
+    out_tbl <- tibble(
+        attribute_value = sapply(values_and_labels, `[`, 1),
+        attribute_label = sapply(values_and_labels, `[`, 2)
+    )
+    return(out_tbl)
+}
+
+# Maps cell_to_tibble to each cell of value-label values from the excel file
+df_of_tibbles <- dmap %>%
+    mutate(across(everything(), ~map(., cell_to_tibble)))
+
+df_of_tibbles$Q1[[1]]
+
+(df_of_tibbles)$Q1
+
+
+tidyr::unnest_longer(data=df_of_tibbles, 1:8) # Cannot use this if each column contains different attribute value lengths
+```
+
+
+You are given a tibble cell i.e. df_of_tibbles$Q1 from
+
+```
+df_of_tibbles <- dmap %>%
+    mutate(across(everything(), ~map(., cell_to_tibble)))
+```
+In case you forgot, it is a tibble containing the attribute_value column and the attribute_label column.
+
+You are also given a table instruction formatted between angled brackets, ie: <instruction>
+
+A certain scripting syntax requires a table format be the following:
+
+<Label> ^(<value>)^<compute_instruction>
+
+For example for Q1 attribute value 9, attribute label "Like Extremely":
+
+Like Extremely ^(9)^
+
+The <label> is "Like Extremely". The <value> is 9. The compute instruction is blank (there isn't one).
+
+Create R code that will take a tibble cell and output a string following the given compute instruction.
+
+
+tibble_cell <- df_of_tibbles$Q1
+table_instruction <- "Mean,T3B,T2B,B2B,Full"
+
+Mean^(1-9)^SM
+Top 3 Box ^(7-9)^
+Top 2 Box ^(8-9)^
+Bottom 2 Box^(1-2)^
+Like Extremely^(9)^
+Like Very Much^(8)^
+Like Moderately^(7)^
+Like Slightly^(6)^
+Neither Like Nor Dislike^(5)^
+Dislike Slightly^(4)^
+Dislike Moderately^(3)^
+Dislike Very Much^(2)^
+Dislike Extremely^(1)^
+
+**GPT Response**
+
+To create R code that will take a tibble cell and output a string following the given compute instruction, we will have to create a function that does the following:
+
+    For each row in the tibble cell, create a string in the format <Label> ^(<value>)^<compute_instruction> where:
+        <Label> is the attribute label.
+        <value> is the attribute value.
+        <compute_instruction> is provided by the table instruction.
+
+    For the special compute instructions "Mean", "T3B", "T2B", "B2B", "Full", provide specific value ranges.
+
+Here is the R code that accomplishes this:
+
+```{r}
+# Function to transform a tibble cell into a string with compute instructions
+compute_instruction_string <- function(tibble_cell, table_instruction) {
+  
+  # Create a list for special compute instructions
+  special_instructions <- list(
+    Mean = "1-9",
+    T3B = "7-9",
+    T2B = "8-9",
+    B2B = "1-2",
+    Full = "1-9"
+  )
+  
+  # Create a vector to hold the output strings
+  output <- character()
+  
+  # Handle special compute instructions
+  for (instruction in strsplit(table_instruction, ",")[[1]]) {
+    output <- c(output, paste0(instruction, " ^(", special_instructions[[instruction]], ")^SM"))
+  }
+  
+  # Handle attribute labels and values
+  for (i in seq_len(nrow(tibble_cell))) {
+    output <- c(output, paste0(tibble_cell$attribute_label[i], " ^(", tibble_cell$attribute_value[i], ")^"))
+  }
+  
+  # Return the output as a single string
+  paste(output, collapse = "\n")
+}
+
+# Use the function on a tibble cell
+tibble_cell <- df_of_tibbles$Q1[[1]] # assuming df_of_tibbles$Q1 is a list of tibbles
+table_instruction <- "Mean,T3B,T2B,B2B,Full"
+compute_instruction_string(tibble_cell, table_instruction)
+
+# MY TRY
+
+dmap_cell <- df_of_tibbles$Q1
+
+table_instruction <- "Mean,T3B,T2B,B2B"
+
+# Create a list for special compute instructions
+special_instructions <- list(
+    Mean = "1-9",
+    T3B = "7-9",
+    T2B = "8-9",
+    B2B = "1-2"
+)
+
+output <- character()
+
+# Handle special compute instructions
+for (instruction in strsplit(table_instruction, ",")[[1]]) {
+    if (instruction == "Mean") {
+        output <- c(output, paste0(instruction, " ^(", special_instructions[[instruction]], ")^SM\n"))
+    } else {
+        output <- c(output, paste0(instruction, " ^(", special_instructions[[instruction]], ")^\n"))
+    }
+}
+
+output
+
+# Handle attribute labels and values
+for (i in seq_len(nrow(dmap_cell))) {
+    output <- c(output, paste0(dmap_cell$attribute_label[i], " ^(", dmap_cell$attribute_value[i], ")^\n"))
+}
+output
+
+paste(output, collapse="\n")
+
+cat(output)
+
+
+```
+
+This function first handles the special compute instructions by using a predefined list that maps instruction names to value ranges. It then handles the attribute labels and values by iterating over the rows in the tibble cell. The results are collected in a vector of strings, which is then collapsed into a single string with newline separators.
+
+Please note that I don't have the capability to execute or test R code directly. I recommend running this code in your R environment to ensure it works as expected.
+
+
+If the table instruction is "Full", write the attribute labels and values from highest to lowest with the following format:
+
+<attribute_label> ^(<attribute_value>)^
+
+```{r}
+# Function to transform a tibble cell into a string for "Full" compute instruction
+full_instruction_string <- function(tibble_cell) {
+  
+  # Sort the tibble cell by attribute value in descending order
+  sorted_tibble_cell <- tibble_cell[order(as.numeric(tibble_cell$attribute_value), decreasing = TRUE), ]
+  
+  # Create a vector to hold the output strings
+  output <- character()
+  
+  # Handle attribute labels and values
+  for (i in seq_len(nrow(sorted_tibble_cell))) {
+    output <- c(output, paste0(sorted_tibble_cell$attribute_label[i], " ^(", sorted_tibble_cell$attribute_value[i], ")^"))
+  }
+  
+  # Return the output as a single string
+  paste(output, collapse = "\n")
+}
+
+# Use the function on a tibble cell
+tibble_cell <- df_of_tibbles$Q1[[1]] # assuming df_of_tibbles$Q1 is a list of tibbles
+cell_full <- full_instruction_string(tibble_cell)
+
+cat(cell_full)
+
+(df_of_tibbles$Q1[[1]])
+
+dmap$Q1
+
+order(as.numeric(tibble_cell$attribute_value), decreasing = TRUE)
+
+class(sapply(df_of_tibbles, `[`, 1))
+class(df_of_tibbles[[1]][[1]])
+
+unnest(df_of_tibbles, cols = c(Q1, Q2, Q3, Q4, Q5, Q6, Q7, Q8)) # Would have to first group together same-length dmaps
+
+
+#### HERE 5/17/2023
+
+# Get a list of tibbles
+dmap_list <- function(dmap_tibble_lists) {
+  # We only need 1 level. So it is safe to hardcode 1 here.
+  # We want to access all of the columns, regardless of number of columns
+  # Quickly and efficiently without a loop. Use '[' the subset function.
+  return(sapply(dmap_tibble_lists, `[`, 1))
+}
+
+dmap_list_output <- dmap_list(df_of_tibbles)
+
+
+dmap_list_output$Q8
+
+# Returns a named character vector
+class(sapply(dmap_list_output, full_instruction_string))
+```
+
+
+## Workflow
+
+Read row of attribute-value mapping from Excel. This would be the third row of the Numeric Red Jade style data.
+
+```{r}
+library(tidyverse)
+library(openxlsx)
+
+dmap <- read.xlsx(xlsxFile="MapList.xlsx")
+dmap # dmap is a data.frame of datamaps from the Red Jade data file. It maps an attribute to it's assigned value
+
+
+# Pure func: Does not depend on any internal functions which aren't a package yet
+# Transform a single cell into a tibble
+cell_to_tibble <- function(cell) {
+    # Split the cell into lines
+    lines <- stringr::str_split(cell, "\n")[[1]]
+    
+    # Split each line into value and label
+    values_and_labels <- stringr::str_split(lines, "=")
+    
+    # Transform into a tibble
+    out_tbl <- tibble(
+        attribute_value = sapply(values_and_labels, `[`, 1),
+        attribute_label = sapply(values_and_labels, `[`, 2)
+    )
+    return(out_tbl)
+}
+
+# Maps cell_to_tibble to each cell of value-label values from the excel file
+df_of_tibbles <- dmap %>%
+    mutate(across(everything(), ~map(., cell_to_tibble)))
+
+# Interface func: Uses another custom func to get desired result
+dmap_to_tibble <- function(dmap) {
+  # Reads raw
+  # @param(dmap): data.frame of attribute-value pairs or datamaps from 
+  #   the raw Red Jade data file (Numeric style).
+  df_of_tibbles <- dmap %>%
+    dplyr::mutate(dplyr::across(dplyr::everything(), ~purrr::map(., cell_to_tibble)))
+  return(df_of_tibbles)
+}
+
+dmap_to_tibble(dmap=dmap)
+
+```
+

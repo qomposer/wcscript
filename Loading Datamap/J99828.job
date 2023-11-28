@@ -1,0 +1,24 @@
+[GLOSSARY]
+[TABLES]
+T1^
+ OR,OV,OI,O%,RV,S1,PO,V2,SA,SP
+ Product
+ Total ^TN^0
+ Mean Summary
+ Q8. Overall Liking ^Q8_1(1-9)^SM
+
+ ^ ^
+ Q1. Appearance Liking
+ Like Extremely ^Q1_1(9)^
+
+
+ Mean ^(1-9)^SM
+ ^ ^
+ Q3. Overall Color JAR
+ Much Too Dark^Q3_1(5)^
+ Slightly Too Dark^(4)^
+   Too Dark ^(4-5)^
+ Just About Right ^(3)^
+
+
+ ^ ^
